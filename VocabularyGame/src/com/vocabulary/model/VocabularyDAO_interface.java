@@ -8,4 +8,5 @@ public interface VocabularyDAO_interface {
     public void delete(String voc_no);
     public VocabularyVO findByPrimaryKey(String voc_no);
     public List<VocabularyVO> getAll();
+    public List<VocabularyVO> getAllByCate(String cate_no);
 }

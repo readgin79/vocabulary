@@ -30,6 +30,8 @@ public class VocabularyDAO implements VocabularyDAO_interface{
 			"INSERT INTO vocabulary (voc_no,voc_name,voc_translate,voc_desc,voc_sentence,voc_pic,cate_no) VALUES (vocabulary_seq.NEXTVAL, ?, ?, ?, ?, ?, ?)";
 		private static final String GET_ALL_STMT = 
 			"SELECT voc_no,voc_name,voc_translate,voc_desc,voc_sentence,voc_pic,cate_no FROM vocabulary order by voc_no";
+		private static final String GET_ALL_STMT_BY_CATE = 
+			"SELECT voc_no,voc_name,voc_translate,voc_desc,voc_sentence,voc_pic,cate_no FROM vocabulary WHERE cate_no = ? order by voc_no";
 		private static final String GET_ONE_STMT = 
 			"SELECT voc_no,voc_name,voc_translate,voc_desc,voc_sentence,voc_pic,cate_no FROM vocabulary where voc_no = ?";
 		private static final String DELETE = 
@@ -233,6 +235,67 @@ public class VocabularyDAO implements VocabularyDAO_interface{
 
 			con = ds.getConnection();
 			pstmt = con.prepareStatement(GET_ALL_STMT);
+			rs = pstmt.executeQuery();
+
+			while (rs.next()) {
+				// empVO ¤]ºÙ¬° Domain objects
+				vocabularyVO = new VocabularyVO();
+				vocabularyVO.setVoc_no(rs.getString("voc_no"));
+				vocabularyVO.setVoc_name(rs.getString("voc_name"));
+				vocabularyVO.setVoc_translate(rs.getString("voc_translate"));
+				vocabularyVO.setVoc_desc(rs.getString("voc_desc"));
+				vocabularyVO.setVoc_sentence(rs.getString("voc_sentence"));
+				vocabularyVO.setVoc_pic(rs.getBytes("voc_pic"));
+				vocabularyVO.setCate_no(rs.getString("cate_no"));
+				list.add(vocabularyVO); // Store the row in the list
+			}
+
+			// Handle any driver errors
+		} catch (SQLException se) {
+			throw new RuntimeException("A database error occured. "
+					+ se.getMessage());
+			// Clean up JDBC resources
+		} finally {
+			if (rs != null) {
+				try {
+					rs.close();
+				} catch (SQLException se) {
+					se.printStackTrace(System.err);
+				}
+			}
+			if (pstmt != null) {
+				try {
+					pstmt.close();
+				} catch (SQLException se) {
+					se.printStackTrace(System.err);
+				}
+			}
+			if (con != null) {
+				try {
+					con.close();
+				} catch (Exception e) {
+					e.printStackTrace(System.err);
+				}
+			}
+		}
+		return list;
+	}
+	@Override
+	public List<VocabularyVO> getAllByCate(String cate_no) {
+		List<VocabularyVO> list = new ArrayList<VocabularyVO>();
+		VocabularyVO vocabularyVO = null;
+
+		Connection con = null;
+		PreparedStatement pstmt = null;
+		ResultSet rs = null;
+
+		try {
+
+			con = ds.getConnection();
+			pstmt = con.prepareStatement(GET_ALL_STMT_BY_CATE);
+			
+			pstmt.setString(1, cate_no);
+			
 			rs = pstmt.executeQuery();
 
 			while (rs.next()) {

@@ -37,12 +37,21 @@
     </div>
     <div>
         <h4>請拼出以下單字</h4>
+        <jsp:useBean id="categorySvc" scope="page" class="com.category.model.CategoryService" />
+		<select name="" id="category">
+			<option value="defult">請選擇測驗範圍</option>
+			<c:forEach var="categoryVO" items="${categorySvc.all}">
+				<option value="${categoryVO.cate_no}">${categoryVO.cate_name}
+			</c:forEach>
+		</select>
+        <span id="number">0</span>
         <table border="1" width="50%">
             <tr>
-                <td><span id="vocChinese"></span></td>
+                <td width="30%"><span id="vocChinese"></span></td>
+                <td width="70%"><span id="vocSentence"></span></td>
             </tr>
             <tr>
-                <td>
+                <td colspan="2">
                 	<input type="hidden" name="" id="vocEng_true" style="width:75%">
                     <input type="text" name="" id="vocEng" style="width:75%">
                     <input type="button" name="" id="sendAns" value="送出答案">
@@ -51,7 +60,6 @@
             </tr>
         </table>
         <h2 id="trueOrFalse"></h2>
-        <h4 id="sentence"></h4>
     </div>
 </body>
 <script>
@@ -108,19 +116,24 @@
 	
 	$(document).ready(function (){
 	    $("#nextQues").click(function(){  //選擇下一題
+	    	console.log($("#category").val());
 	        $.ajax({
 	             type:"POST",
 	             url: "/VocabularyGame/vocabulary/vocabulary.do", 
-	             data:{"action":"getOne_For_Display"},
+	             data:{"action":"getOne_For_Display","category":$("#category").val()},
 	             dataType: "json",       
 	             
 	             success : function(response){
 	                 $("#vocChinese").text(response.voc_translate);
 	                 $("#vocEng_true").val(response.voc_name);
+	                 $("#vocSentence").text(response.voc_sentence);
+	                 $("#trueOrFalse").hide();
+	                 $("#vocEng").val("");
+	                 $("#number").text(response.number);
 	             },
 	             
 	             error:function(xhr, ajaxOptions, thrownError){
-	                 alert(xhr.status+"\n"+thrownError);
+	                 alert("本範圍測驗結束");
 	             }
 	      	});
 	     });
@@ -134,6 +147,7 @@
 	             
 	             success : function(response){
 	                 $("#trueOrFalse").text(response.trueOrFalse);
+	                 $("#trueOrFalse").show();
 	             },
 	             
 	             error:function(xhr, ajaxOptions, thrownError){

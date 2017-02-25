@@ -53,4 +53,8 @@ public class VocabularyService {
 	public List<VocabularyVO> getAll() {
 		return dao.getAll();
 	}
+	
+	public List<VocabularyVO> getAllByCate(String cate_no) {
+		return dao.getAllByCate(cate_no);
+	}
 }
